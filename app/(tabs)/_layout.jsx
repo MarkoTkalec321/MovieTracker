@@ -12,7 +12,14 @@ const TabsLayout = () => {
   if (!loading && !isLogged) return <Redirect href="/sign-in" />;
 
   return (
-    <Tabs>
+    <Tabs
+      screenOptions={{
+        tabBarStyle: { backgroundColor: "#121212" },
+        tabBarActiveTintColor: "#F5C518",
+        tabBarInactiveTintColor: "#FFFFFF",
+        tabBarShowLabel: true,
+      }}
+    >
       <Tabs.Screen
         name="discover"
         options={{

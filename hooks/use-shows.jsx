@@ -8,14 +8,12 @@ export const useShows = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [noResultsMessage, setNoResultsMessage] = useState("");
 
-  // Paging and loading states
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
   const [hasMore, setHasMore] = useState(true);
 
-  // Load TV show genres on mount
   useEffect(() => {
     const loadGenres = async () => {
       const fetched = await fetchShowGenres();
@@ -24,7 +22,6 @@ export const useShows = () => {
     loadGenres();
   }, []);
 
-  // Fetch shows whenever selectedGenres or page change (if not searching)
   useEffect(() => {
     const loadShows = async () => {
       setLoading(true);
@@ -33,9 +30,7 @@ export const useShows = () => {
         console.log("Fetching page:", page);
         const newShows = await fetchShows(selectedGenres, page);
         setShows((prevShows) => {
-          // Combine previous shows with newShows (if page > 1) or just newShows for page 1
           const combined = page === 1 ? newShows : [...prevShows, ...newShows];
-          // Deduplicate by show id
           const uniqueShows = Array.from(
             new Map(combined.map(show => [show.id, show])).values()
           );
@@ -56,14 +51,12 @@ export const useShows = () => {
     }
   }, [selectedGenres, page, searchQuery]);
 
-  // Load more shows (pagination)
   const loadMoreShows = () => {
     if (!loading && hasMore) {
       setPage((prev) => prev + 1);
     }
   };
 
-  // Handle pull-to-refresh
   const onRefresh = async () => {
     setRefreshing(true);
     setSelectedGenres([]);
@@ -77,21 +70,18 @@ export const useShows = () => {
     setRefreshing(false);
   };
 
-  // Handle TV show search
   const onSearch = async () => {
     const { results, message } = await handleShowSearch(searchQuery);
     setShows(results);
     setNoResultsMessage(message);
   };
 
-  // Clear search and reset shows to default based on selected genres
   const clearSearch = () => {
     setSearchQuery("");
     fetchShows(selectedGenres).then(setShows);
     setNoResultsMessage("");
   };
 
-  // Handle genre selection
   const handleGenrePress = (genreId) => {
     if (genreId === -1) {
       setSelectedGenres([]);

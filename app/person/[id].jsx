@@ -1,4 +1,3 @@
-// app/person/[id].jsx
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -12,14 +11,13 @@ import {
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { usePersonDetail } from "../../hooks/use-person-detail";
-import { fetchPersonCredits } from "../../lib/tmdb/person"; // adjust the path as needed
+import { fetchPersonCredits } from "../../lib/tmdb/person";
 
 export default function PersonDetailScreen() {
-  const { id } = useLocalSearchParams(); // person id from the route
+  const { id } = useLocalSearchParams();
   const router = useRouter();
   const { person, loading, error } = usePersonDetail(id);
   
-  // State for filmography (movies the person acted in)
   const [filmography, setFilmography] = useState([]);
   const [filmographyLoading, setFilmographyLoading] = useState(true);
 
@@ -29,7 +27,6 @@ export default function PersonDetailScreen() {
       try {
         setFilmographyLoading(true);
         const creditsData = await fetchPersonCredits(id);
-        // Filter for movies only. Ensure that your TMDB response contains a 'media_type' property.
         const movies = creditsData.cast.filter(
           (item) => item.media_type === "movie"
         );
@@ -80,11 +77,11 @@ export default function PersonDetailScreen() {
   } = person;
 
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1 bg-[#121212]">
       {/* Custom Top Bar with Back Arrow */}
-      <View className="h-14 flex-row items-center px-4 bg-white shadow-sm">
+      <View className="h-14 flex-row items-center px-4 bg-[#121212] shadow-sm">
         <TouchableOpacity onPress={() => router.back()}>
-          <Ionicons name="arrow-back-outline" size={24} color="black" />
+          <Ionicons name="arrow-back-outline" size={35} color="white" />
         </TouchableOpacity>
       </View>
 
@@ -100,21 +97,21 @@ export default function PersonDetailScreen() {
           ) : (
             <Ionicons name="person-circle-outline" size={140} color="gray" />
           )}
-          <Text className="text-2xl font-bold mt-4 text-gray-800">{name}</Text>
+          <Text className="text-2xl font-bold mt-4 text-white">{name}</Text>
           {known_for_department && (
-            <Text className="text-sm text-gray-500">{known_for_department}</Text>
+            <Text className="text-sm text-gray-400">{known_for_department}</Text>
           )}
         </View>
 
         {/* Divider */}
-        <View className="border-b border-gray-300 my-4" />
+        <View className="border-b border-[#f5c518] my-4" />
 
         {/* Also Known As */}
         {also_known_as && also_known_as.length > 0 && (
           <View className="mb-4">
-            <Text className="text-lg font-semibold text-gray-800 mb-2">Also Known As</Text>
+            <Text className="text-lg font-semibold text-white mb-2">Also Known As</Text>
             {also_known_as.map((aka, index) => (
-              <Text key={index} className="text-sm text-gray-700">
+              <Text key={index} className="text-sm text-gray-400">
                 {aka}
               </Text>
             ))}
@@ -122,30 +119,30 @@ export default function PersonDetailScreen() {
         )}
 
         {/* Divider */}
-        <View className="border-b border-gray-300 my-4" />
+        <View className="border-b border-[#f5c518] my-4" />
 
         {/* Birthday & Place of Birth */}
         <View className="mb-4">
           {birthday && (
             <View className="mb-3">
-              <Text className="text-lg font-semibold text-gray-800 mb-1">Birthday</Text>
-              <Text className="text-sm text-gray-700">{birthday}</Text>
+              <Text className="text-lg font-semibold text-white mb-1">Birthday</Text>
+              <Text className="text-sm text-gray-400">{birthday}</Text>
             </View>
           )}
           {place_of_birth && (
             <View>
-              <Text className="text-lg font-semibold text-gray-800 mb-1">Place of Birth</Text>
-              <Text className="text-sm text-gray-700">{place_of_birth}</Text>
+              <Text className="text-lg font-semibold text-white mb-1">Place of Birth</Text>
+              <Text className="text-sm text-gray-400">{place_of_birth}</Text>
             </View>
           )}
         </View>
 
         {/* Divider */}
-        <View className="border-b border-gray-300 my-4" />
+        <View className="border-b border-[#f5c518] my-4" />
 
         {/* Filmography Section */}
         <View className="mb-4">
-          <Text className="text-lg font-semibold text-gray-800 mb-2">Filmography</Text>
+          <Text className="text-lg font-semibold text-white mb-2">Filmography</Text>
           {filmographyLoading ? (
             <ActivityIndicator size="small" color="#999" />
           ) : (
@@ -169,7 +166,7 @@ export default function PersonDetailScreen() {
                     resizeMode="cover"
                 />
                 <Text
-                    className="text-sm mt-1 w-20 text-center text-gray-700"
+                    className="text-sm mt-1 w-20 text-center text-gray-400"
                     numberOfLines={1}
                 >
                     {item.title || item.name}
@@ -181,16 +178,14 @@ export default function PersonDetailScreen() {
           )}
         </View>
 
-
         {/* Divider */}
-        <View className="border-b border-gray-300 my-4" />
+        <View className="border-b border-[#f5c518] my-4" />
 
-        
         {/* Biography */}
         {biography && (
           <View className="mb-4">
-            <Text className="text-lg font-semibold text-gray-800 mb-2">Biography</Text>
-            <Text className="text-sm text-gray-700 leading-5">{biography}</Text>
+            <Text className="text-lg font-semibold text-white mb-2">Biography</Text>
+            <Text className="text-sm text-gray-400 leading-5">{biography}</Text>
           </View>
         )}
       </ScrollView>

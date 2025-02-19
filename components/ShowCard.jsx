@@ -10,7 +10,6 @@ const ShowCard = ({ item }) => {
   const [showDetails, setShowDetails] = useState(null);
   const [savedDocId, setSavedDocId] = useState(null);
 
-  // Fetch TV show details on mount
   useEffect(() => {
     const fetchDetails = async () => {
       const details = await getShowDetails(item.id);
@@ -19,7 +18,6 @@ const ShowCard = ({ item }) => {
     fetchDetails();
   }, [item.id]);
 
-  // Check if show is already saved
   useEffect(() => {
     const checkSaved = async () => {
       if (user) {
@@ -30,7 +28,6 @@ const ShowCard = ({ item }) => {
     checkSaved();
   }, [user, item.id]);
 
-  // Handle save / remove action
   const handleSaveOrRemoveShow = useCallback(async () => {
     if (!user) return;
     if (savedDocId) {
@@ -52,7 +49,6 @@ const ShowCard = ({ item }) => {
     }
   }, [user, savedDocId, item.id]);
 
-  // Format primary info for TV shows: "Year • X Seasons"
   const formatShowPrimaryInfo = useCallback((details) => {
     const year = details.first_air_date ? new Date(details.first_air_date).getFullYear() : "N/A";
     const seasons = details.number_of_seasons ? `${details.number_of_seasons} Seasons` : "";
@@ -61,7 +57,7 @@ const ShowCard = ({ item }) => {
 
   return (
     <MediaCard
-      type={"show"}      // "movie" or "show"
+      type={"show"}
       id={item.id} 
       posterPath={item.poster_path}
       title={item.name}
@@ -74,8 +70,8 @@ const ShowCard = ({ item }) => {
       {showDetails && (
         <View className="flex-row flex-wrap mt-1 items-center justify-center">
           {showDetails.genres.map((genre) => (
-            <View key={genre.id} className="bg-gray-200 rounded-full px-2 py-1 mx-1 mb-1">
-              <Text className="text-[10px]">{genre.name}</Text>
+            <View key={genre.id} className="bg-white rounded-full px-2 py-1 mx-1 mb-1">
+              <Text className="text-[11px] text-gray-800 font-semibold">{genre.name}</Text>
             </View>
           ))}
         </View>

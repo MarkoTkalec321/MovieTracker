@@ -12,22 +12,21 @@ export default function DiscoverLayout() {
     <Tab.Navigator
       screenOptions={({ route }) => ({
         tabBarStyle: { backgroundColor: "#222" },
-        tabBarIndicatorStyle: { backgroundColor: "red" },
-        // We'll use a custom label that shows both text and icon
-        tabBarShowIcon: false,
+        tabBarIndicatorStyle: { backgroundColor: "#F5C518" },
+        tabBarShowIcon: false, // Icons handled inside custom label
         tabBarLabel: () => {
           let iconName;
           if (route.name === "Movies") {
-            iconName = "film-outline"; // Ionicons icon for movies
+            iconName = "film-outline";
           } else if (route.name === "Shows") {
-            iconName = "tv-outline"; // Ionicons icon for TV shows
+            iconName = "tv-outline";
           }
           return (
-            <View style={{ alignItems: "center" }}>
-              <Text style={{ color: "white", fontSize: 14 }}>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <Text style={{ color: "white", fontSize: 14, marginRight: 15 }}>
                 {route.name}
               </Text>
-              <Ionicons name={iconName} size={20} color="yellow" />
+              <Ionicons name={iconName} size={18} color="yellow" />
             </View>
           );
         },

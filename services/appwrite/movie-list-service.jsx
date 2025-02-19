@@ -1,4 +1,4 @@
-import { config } from "../../lib/appwrite/config"; // Adjust the path to your config file
+import { config } from "../../lib/appwrite/config";
 import { ID, Query } from 'react-native-appwrite';
 import { databases } from '../../lib/appwrite/initializeClient';
 
@@ -40,9 +40,9 @@ export const getMovieWatchlistForUser = async (userId) => {
 export const addMovieToWatchlist = async (userId, movieId) => {
   try {
     const response = await databases.createDocument(
-      config.databaseId, // Your Appwrite database ID
+      config.databaseId,
       config.movieListCollectionId,
-      ID.unique(), // Automatically generate a unique document ID
+      ID.unique(),
       {
         userId,
         movieId,

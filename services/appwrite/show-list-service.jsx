@@ -1,4 +1,4 @@
-import { config } from "../../lib/appwrite/config"; // Adjust the path to your config file
+import { config } from "../../lib/appwrite/config";
 import { ID, Query } from 'react-native-appwrite';
 import { databases } from '../../lib/appwrite/initializeClient';
 
@@ -6,7 +6,7 @@ export const getWatchlistEntryForShow = async (userId, showId) => {
     try {
       const response = await databases.listDocuments(
         config.databaseId,
-        config.showListCollectionId, // Make sure this is defined in your config
+        config.showListCollectionId,
         [
           Query.equal("userId", userId),
           Query.equal("showId", showId)

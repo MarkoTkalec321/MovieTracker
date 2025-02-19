@@ -1,19 +1,16 @@
-// theme.js
-import React, { createContext, useState, useContext } from "react";
-
-export const imdbTheme = {
-  name: "dark", // dark mode
+const imdbTheme = {
+  name: "dark",
   colors: {
-    primary: "#f5c518",      // IMDb Yellow
-    background: "#121212",   // Dark background
-    textPrimary: "#ffffff",  // White text
-    textSecondary: "#b3b3b3",// Light gray text
-    border: "#333333",       // Dark gray border
+    primary: "#f5c518",
+    background: "#121212",
+    textPrimary: "#ffffff",
+    textSecondary: "#b3b3b3",
+    border: "#333333",
   },
 };
 
-export const lightTheme = {
-  name: "light", // light mode
+const lightTheme = {
+  name: "light",
   colors: {
     primary: "#f5c518",
     background: "#ffffff",
@@ -23,27 +20,8 @@ export const lightTheme = {
   },
 };
 
-const ThemeContext = createContext({
+module.exports = {
+  imdbTheme,
+  lightTheme,
   theme: imdbTheme,
-  toggleTheme: () => {},
-});
-
-export function ThemeProvider({ children }) {
-  const [theme, setTheme] = useState(imdbTheme);
-
-  const toggleTheme = () => {
-    setTheme((prevTheme) =>
-      prevTheme.name === "dark" ? lightTheme : imdbTheme
-    );
-  };
-
-  return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
-      {children}
-    </ThemeContext.Provider>
-  );
-}
-
-export function useTheme() {
-  return useContext(ThemeContext);
-}
+};

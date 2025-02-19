@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, TextInput, FlatList, TouchableOpacity, RefreshControl, ScrollView, ActivityIndicator } from "react-native";
+import { View, TextInput, FlatList, TouchableOpacity, RefreshControl, ScrollView, ActivityIndicator } from "react-native";
 import { useShows } from "../../../hooks/use-shows";
 import ShowCard from "../../../components/ShowCard";
 import GenreFAB from "../../../components/GenreFAB";
@@ -25,12 +25,13 @@ const Shows = () => {
   const scrollY = new Animated.Value(0);
 
   return (
-    <View className="flex-1 p-4 bg-white">
+    <View className="flex-1 p-4 bg-[#1f1d1d]">
       {/* Search Bar */}
-      <View className="flex-row items-center h-13 border border-gray-300 rounded-lg px-3 mb-4">
+      <View className="flex-row items-center h-13 border border-[#f5c518] rounded-lg px-3 mb-4">
         <TextInput
           className="flex-1"
           placeholder="Search TV shows..."
+          placeholderTextColor="#b3b3b3"
           value={searchQuery}
           onChangeText={setSearchQuery}
           returnKeyType="search"

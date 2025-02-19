@@ -16,10 +16,8 @@ export default function DetailScreen() {
   const { type, id } = useLocalSearchParams();
   const router = useRouter();
 
-  // Use the custom hook
   const { data, cast, loading, error } = useMediaDetail(type, id);
 
-  // Loading state
   if (loading) {
     return (
       <View className="flex-1 items-center justify-center bg-white">
@@ -29,7 +27,6 @@ export default function DetailScreen() {
     );
   }
 
-  // Error state
   if (error) {
     return (
       <View className="flex-1 items-center justify-center bg-white p-4">
@@ -38,7 +35,6 @@ export default function DetailScreen() {
     );
   }
 
-  // If still no data (unexpected)
   if (!data) {
     return (
       <View className="flex-1 items-center justify-center bg-white">
@@ -47,44 +43,37 @@ export default function DetailScreen() {
     );
   }
 
-  // De-structure fields from the fetched data
   const {
     poster_path,
     title,
-    name,            // TV shows often use 'name' field instead of 'title'
+    name,        
     release_date,
-    first_air_date,  // TV shows use first_air_date
+    first_air_date,
     runtime,
-    episode_run_time, // TV shows might have an array for episode_run_time
+    episode_run_time,
     vote_average,
     vote_count,
     overview,
     production_countries,
     production_companies,
     revenue,
-    // ... any other fields you need
   } = data;
 
-  // Convert runtime: for TV, it's usually in "episode_run_time" array
   const finalRuntime = runtime
     ? `${Math.floor(runtime / 60)}h ${runtime % 60}m`
     : episode_run_time?.length
-    ? `${episode_run_time[0]}m` // Just pick first episode runtime for demonstration
+    ? `${episode_run_time[0]}m`
     : "N/A";
 
-  // Convert date: for movies, it's release_date; for shows, it's first_air_date
   const finalDate = release_date || first_air_date || "N/A";
 
-  // Countries
   const countryStr = production_countries
     ?.map((c) => c.name)
     .join(", ");
 
-  // Title-like field (movie vs show)
   const finalTitle = title || name || "Untitled";
 
   const renderCastItem = ({ item }) => {
-    // People in TMDB typically have an `id` (person ID).
     return (
       <TouchableOpacity
         onPress={() => router.push(`/person/${item.id}`)}
@@ -100,9 +89,12 @@ export default function DetailScreen() {
             resizeMode="cover"
           />
         ) : (
-          <Ionicons name="person-circle-outline" size={80} color="gray" />
+          <View className="w-20 h-20 items-center justify-center">
+            <Ionicons name="person-circle-outline" size={75} color="white" />
+          </View>
         )}
-        <Text className="text-sm mt-1 w-20 text-center text-gray-700">
+
+        <Text className="text-sm mt-1 w-20 text-center text-white">
           {item.name}
         </Text>
       </TouchableOpacity>
@@ -110,7 +102,12 @@ export default function DetailScreen() {
   };
 
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1 bg-[#121212]">
+      <View className="h-14 flex-row items-center px-4 bg-[#121212] shadow-sm">
+        <TouchableOpacity onPress={() => router.back()}>
+          <Ionicons name="arrow-back-outline" size={35} color="white" />
+        </TouchableOpacity>
+      </View>
       <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
         {/* Poster with arrow in top-left */}
         <View className="relative">
@@ -122,57 +119,47 @@ export default function DetailScreen() {
           }}
           style={{
             width: "100%",
-            height: 300, // Ensure it has a fixed height
-            resizeMode: "cover", // Ensures the image covers the space while maintaining aspect ratio
+            height: 300,
+            resizeMode: "cover",
           }}
         />
-          {/* Back arrow */}
-          <TouchableOpacity
-            onPress={() => router.back()}
-            style={{
-              position: "absolute",
-              top: 16,
-              left: 16,
-            }}
-          >
-            <Ionicons name="arrow-back-outline" size={24} color="#fff" />
-          </TouchableOpacity>
+
         </View>
 
         {/* Title + Basic Info */}
         <View className="p-4">
-          <Text className="text-2xl font-bold mb-1">{finalTitle}</Text>
-          <Text className="text-sm text-gray-600">
+          <Text className="text-2xl font-bold mb-1 text-white">{finalTitle}</Text>
+          <Text className="text-sm text-gray-400">
             {finalDate} • {finalRuntime}
           </Text>
-          <Text className="text-sm text-gray-600 mt-2">
+          <Text className="text-sm text-gray-400 mt-2">
             Rating: {vote_average?.toFixed(1)}/10 ({vote_count} votes)
           </Text>
         </View>
 
-        <View className="border-b border-gray-300 my-3 mx-4" />
+        <View className="border-b border-[#f5c518] my-3 mx-4" />
 
         {/* Overview */}
         <View className="px-4">
-          <Text className="text-lg font-semibold mb-2">Overview</Text>
-          <Text className="text-sm text-gray-700 leading-5">{overview}</Text>
+          <Text className="text-lg font-semibold mb-2 text-white">Overview</Text>
+          <Text className="text-sm text-gray-400 leading-5">{overview}</Text>
         </View>
 
-        <View className="border-b border-gray-300 my-3 mx-4" />
+        <View className="border-b border-[#f5c518] my-3 mx-4" />
 
         {/* Production Country */}
         <View className="px-4">
-          <Text className="text-lg font-semibold mb-2">
+          <Text className="text-lg font-semibold mb-2 text-white">
             {type === "movie" ? "Made In" : "Origin Country"}
           </Text>
-          <Text className="text-sm text-gray-700">{countryStr || "Unknown"}</Text>
+          <Text className="text-sm text-gray-400">{countryStr || "Unknown"}</Text>
         </View>
 
-        <View className="border-b border-gray-300 my-3 mx-4" />
+        <View className="border-b border-[#f5c518] my-3 mx-4" />
 
         {/* Production Companies */}
         <View className="px-4">
-          <Text className="text-lg font-semibold mb-2">Production</Text>
+          <Text className="text-lg font-semibold mb-2 text-white">Production</Text>
           {production_companies?.map((company) => (
             <View key={company.id} className="flex-row items-center mb-2">
               {company.logo_path && (
@@ -184,7 +171,7 @@ export default function DetailScreen() {
                   resizeMode="contain"
                 />
               )}
-              <Text className="text-sm text-gray-700">{company.name}</Text>
+              <Text className="text-sm text-gray-400">{company.name}</Text>
             </View>
           ))}
         </View>
@@ -192,10 +179,11 @@ export default function DetailScreen() {
         {/* If there's a revenue field (movies), show it */}
         {type === "movie" && (
           <>
-            <View className="border-b border-gray-300 my-3 mx-4" />
+            <View className="border-b border-[#f5c518] my-3 mx-4" />
+
             <View className="px-4 mb-2">
-              <Text className="text-lg font-semibold mb-2">Revenue</Text>
-              <Text className="text-sm text-gray-700">
+              <Text className="text-lg font-semibold mb-2 text-white">Revenue</Text>
+              <Text className="text-sm text-gray-400">
                 ${revenue?.toLocaleString() || "0"}
               </Text>
             </View>
@@ -203,11 +191,11 @@ export default function DetailScreen() {
         )}
 
         {/* Horizontal line */}
-        <View className="border-b border-gray-300 my-3 mx-4" />
+        <View className="border-b border-[#f5c518] my-3 mx-4" />
 
         {/* Cast */}
         <View className="px-4">
-        <Text className="text-lg font-semibold mb-2">Cast</Text>
+        <Text className="text-lg font-semibold mb-2 text-white">Cast</Text>
         <FlatList
             horizontal
             data={cast}
