@@ -13,7 +13,7 @@ export default function DiscoverLayout() {
       screenOptions={({ route }) => ({
         tabBarStyle: { backgroundColor: "#222" },
         tabBarIndicatorStyle: { backgroundColor: "#F5C518" },
-        tabBarShowIcon: false, // Icons handled inside custom label
+        tabBarShowIcon: false,
         tabBarLabel: () => {
           let iconName;
           if (route.name === "Movies") {
