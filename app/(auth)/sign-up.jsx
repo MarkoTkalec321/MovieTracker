@@ -5,7 +5,7 @@ import { ScrollView } from 'react-native'
 import FormField from '../../components/FormField'
 import CustomButton from '../../components/CustomButton'
 import { Link, router } from 'expo-router'
-import { createUser } from '../../lib/appwrite'
+import { createUser } from '../../lib/appwrite/auth'
 import { useGlobalContext } from "../../context/GlobalProvider"
 
 const SignUp = () => {
@@ -31,7 +31,7 @@ const SignUp = () => {
       setIsLogged(true)
 
       Alert.alert("Success", "User signed up successfully!")
-      router.replace('/home');
+      router.replace('/(tabs)/discover');
     } catch (error) {
       Alert.alert('Error', error.message);
     } finally {

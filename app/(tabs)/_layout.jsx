@@ -14,22 +14,22 @@ const TabsLayout = () => {
   return (
     <Tabs>
       <Tabs.Screen
-        name="home"
-        options={{
-          title: "Home",
-          headerShown: false,
-          tabBarIcon: ({ color }) => (
-            <TabIcon name="home-outline" color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
         name="discover"
         options={{
           title: "Discover",
           headerShown: false,
           tabBarIcon: ({ color, focused }) => (
             <Icon name={focused ? "search" : "search-outline"} size={24} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="watchlist"
+        options={{
+          title: "Watchlist",
+          headerShown: false,
+          tabBarIcon: ({ color }) => (
+            <TabIcon name="bookmark-outline" color={color} />
           ),
         }}
       />

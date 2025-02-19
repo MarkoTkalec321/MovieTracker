@@ -1,7 +1,8 @@
-import React, { useState } from "react";
-import { View, Text, TextInput, FlatList, TouchableOpacity, RefreshControl, ScrollView } from "react-native";
-import { useMovies } from "../../../hooks/use-movies";
-import MovieCard from "../../../components/MovieCard";
+import React, { useCallback } from "react";
+import { FlatList, RefreshControl, ActivityIndicator, Animated, ScrollView, TouchableOpacity, TextInput, View } from "react-native";
+import { useMovies } from "../../../hooks/use-movies"; // Custom hook
+import MovieCard from "../../../components/MovieCard"; // Memoized MovieCard component
+import GenreFAB from "../../../components/GenreFAB";
 import Icon from "react-native-vector-icons/Ionicons";
 
 const Movies = () => {
@@ -10,57 +11,29 @@ const Movies = () => {
     selectedGenres,
     movies,
     searchQuery,
-    noResultsMessage,
-    setGenres,
-    setMovies,
     setSearchQuery,
-    setSelectedGenres,
     onSearch,
     clearSearch,
-    fetchMovies,
-    fetchGenres
+    loadMoreMovies,
+    onRefresh,
+    handleGenrePress,
+    loading,
+    refreshing,
   } = useMovies();
 
-  const [refreshing, setRefreshing] = useState(false);
+  // Animated value for scroll event (for animating genre FABs)
+  const scrollY = new Animated.Value(0);
 
-  // Handle genre selection
-  const handleGenrePress = (genreId) => {
-    if (genreId === -1) {
-      setSelectedGenres([]);
-    } else {
-      const updatedGenres = selectedGenres.includes(-1)
-        ? [genreId]
-        : selectedGenres.includes(genreId)
-        ? selectedGenres.filter((id) => id !== genreId)
-        : [...selectedGenres, genreId];
-      setSelectedGenres(updatedGenres);
-    }
-  };
-
-  // Handle pull-to-refresh
-  const onRefresh = async () => {
-    setRefreshing(true);
-    setSelectedGenres([]);
-    const genres = await fetchGenres();
-    const movies = await fetchMovies([]);
-    setGenres(genres);
-    setMovies(movies);
-    setRefreshing(false);
-  };
-
-  // Render genre FABs
-  const renderGenreFAB = ({ item }) => (
-    <TouchableOpacity
-      className={`h-9 px-3 mx-1 mb-2 bg-gray-200 rounded-full flex items-center justify-center ${
-        selectedGenres.includes(item.id) || (item.id === -1 && selectedGenres.length === 0)
-          ? "bg-red-500"
-          : ""
-      }`}
-      onPress={() => handleGenrePress(item.id)}
-    >
-      <Text className="text-sm text-black">{item.name}</Text>
-    </TouchableOpacity>
+  const renderMovieItem = useCallback(
+    ({ item }) => <MovieCard item={item} />,
+    []
   );
+
+  const getItemLayout = useCallback((data, index) => ({
+    length: 192,
+    offset: 192 * index,
+    index,
+  }), []);
 
   return (
     <View className="flex-1 p-4 bg-white">
@@ -81,38 +54,73 @@ const Movies = () => {
         )}
       </View>
 
-      {/* Genre FABs */}
+      {/* Animated Genre FABs (Horizontal Scroll) */}
+      <Animated.View
+        className="overflow-hidden"
+        style={{
+          height: scrollY.interpolate({
+            inputRange: [0, 150],
+            outputRange: [50, 0],
+            extrapolate: "clamp",
+          }),
+          opacity: scrollY.interpolate({
+            inputRange: [0, 150],
+            outputRange: [1, 0],
+            extrapolate: "clamp",
+          }),
+          transform: [
+            {
+              translateY: scrollY.interpolate({
+                inputRange: [0, 150],
+                outputRange: [0, -30],
+                extrapolate: "clamp",
+              }),
+            },
+          ],
+        }}
+      >
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 8, paddingHorizontal: 4 }}
+        >
+          {genres.map((item) => (
+            <GenreFAB
+              key={`genre-${item.id}`}
+              item={item}
+              selected={
+                selectedGenres.includes(item.id) ||
+                (item.id === -1 && selectedGenres.length === 0)
+              }
+              onPress={handleGenrePress}
+            />
+          ))}
+        </ScrollView>
+      </Animated.View>
+
+      {/* Movie List with Scroll Event */}
       <FlatList
-        data={genres}
-        renderItem={renderGenreFAB}
-        keyExtractor={(item) => item.id.toString()}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        className="pb-6"
-      />
-
-      {/* No Results Message */}
-      {noResultsMessage && (
-        <Text className="text-sm text-gray-600 text-center mb-4">
-          {noResultsMessage}
-        </Text>
-      )}
-
-      {/* Movie List with Pull-to-Refresh */}
-      <ScrollView
+        data={movies}
+        renderItem={renderMovieItem}
+        keyExtractor={(item, index) => `${item.id}-${index}`}
+        contentContainerStyle={{ paddingBottom: 16 }}
+        onEndReached={loadMoreMovies}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={
+          loading ? <ActivityIndicator size="large" color="#0000ff" /> : null
+        }
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
-      >
-        {/* Movie List */}
-        <FlatList
-          data={movies}
-          renderItem={({ item }) => <MovieCard item={item} />}
-          keyExtractor={(item) => item.id.toString()}
-          scrollEnabled={false}
-          contentContainerStyle={{ paddingBottom: 16 }}
-        />
-      </ScrollView>
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          { useNativeDriver: false }
+        )}
+        initialNumToRender={10}
+        windowSize={5}
+        removeClippedSubviews={true}
+        getItemLayout={getItemLayout}
+      />
     </View>
   );
 };

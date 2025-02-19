@@ -1,11 +1,11 @@
-import { View, Text, Image, Alert } from 'react-native'
+import { View, Text, Alert } from 'react-native'
 import React, { useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { ScrollView } from 'react-native'
 import FormField from '../../components/FormField'
 import CustomButton from '../../components/CustomButton'
 import { Link, router } from 'expo-router'
-import { getCurrentUser, signIn } from '../../lib/appwrite'
+import { getCurrentUser, signIn } from '../../lib/appwrite/auth'
 import { useGlobalContext } from "../../context/GlobalProvider"
 
 const SignIn = () => {
@@ -31,7 +31,7 @@ const SignIn = () => {
       setIsLogged(true)
 
       Alert.alert("Success", "User signed in successfully!")
-      router.replace('/(tabs)home');
+      router.replace('/(tabs)/discover');
     } catch (error) {
       Alert.alert('Error', error.message);
     } finally {
@@ -51,7 +51,6 @@ const SignIn = () => {
             value={form.email}
             handleChangeText={(e) => setForm({ ...form, email: e })}
             otherStyles="mt-7"
-            placeholder="Enter your email"
             keyboardType="email-address"
           />
           <FormField 
@@ -59,7 +58,6 @@ const SignIn = () => {
             value={form.password}
             handleChangeText={(e) => setForm({ ...form, password: e })}
             otherStyles="mt-7"
-            placeholder="Enter your password"
           />
           <CustomButton 
             title="Sign in"
