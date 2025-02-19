@@ -1,9 +1,14 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, Image, TouchableOpacity } from "react-native";
-import { getMovieDetails } from "../lib/api-tmdb/movie";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
+import { View, Text } from "react-native";
+import { getMovieDetails } from "../lib/tmdb/movie";
+import { addMovieToWatchlist, removeMovieFromWatchlist, getWatchlistEntryForMovie } from "../services/appwrite/movie-list-service";
+import { useGlobalContext } from "../context/GlobalProvider";
+import MediaCard from "./MediaCard";
 
 const MovieCard = ({ item }) => {
+  const { user } = useGlobalContext();
   const [movieDetails, setMovieDetails] = useState(null);
+  const [savedDocId, setSavedDocId] = useState(null);
 
   // Fetch movie details when the component mounts
   useEffect(() => {
@@ -14,65 +19,76 @@ const MovieCard = ({ item }) => {
     fetchDetails();
   }, [item.id]);
 
-  // Format runtime (e.g., 120 -> "2h 0m")
-  const formatRuntime = (runtime) => {
-    const hours = Math.floor(runtime / 60);
-    const minutes = runtime % 60;
-    return `${hours}h ${minutes}m`;
-  };
+  // Check if movie is saved when user or item changes
+  useEffect(() => {
+    const checkSaved = async () => {
+      if (user) {
+        const docId = await getWatchlistEntryForMovie(user.$id, item.id);
+        setSavedDocId(docId);
+      }
+    };
+    checkSaved();
+  }, [user, item.id]);
 
-  // Format release date (e.g., "1968-09-07" -> "1968")
-  const formatReleaseDate = (date) => {
-    return date ? new Date(date).getFullYear() : "N/A";
-  };
+  // Memoize the save/remove function so it doesn't change on every render
+  const handleSaveOrRemoveMovie = useCallback(async () => {
+    if (!user) return;
+    if (savedDocId) {
+      try {
+        await removeMovieFromWatchlist(savedDocId);
+        setSavedDocId(null);
+      } catch (error) {
+        console.error("Error removing movie:", error);
+      }
+    } else {
+      try {
+        const response = await addMovieToWatchlist(user.$id, item.id);
+        setSavedDocId(response.$id);
+      } catch (error) {
+        console.error("Error saving movie:", error);
+      }
+    }
+  }, [user, savedDocId, item.id]);
 
-  // Render genre FABs for the movie
-  const renderMovieGenreFAB = (genre) => (
-    <TouchableOpacity
-      key={genre.id}
-      className="p-2 m-1 bg-gray-200 rounded-full"
-    >
-      <Text className="text-sm text-black">{genre.name}</Text>
-    </TouchableOpacity>
-  );
+  // Memoize formatting function
+  const formatPrimaryInfo = useCallback((details) => {
+    const releaseYear = details.release_date ? new Date(details.release_date).getFullYear() : "N/A";
+    const runtime = details.runtime ? `${Math.floor(details.runtime / 60)}h ${details.runtime % 60}m` : "";
+    return `${releaseYear} • ${runtime}`;
+  }, []);
+
+  // Memoize rendering of genres using NativeWind classes
+  const renderedGenres = useMemo(() => {
+    if (!movieDetails) return null;
+    return (
+      <View className="flex-row flex-wrap mt-1 items-center justify-center">
+        {movieDetails.genres.map((genre) => (
+          <View
+            key={genre.id}
+            className="bg-gray-200 rounded-full px-2 py-1 mx-1 mb-1"
+          >
+            <Text className="text-[10px] text-gray-800">{genre.name}</Text>
+          </View>
+        ))}
+      </View>
+    );
+  }, [movieDetails]);
 
   return (
-    <View className="flex-row mb-4 bg-gray-100 rounded-2xl overflow-hidden h-48">
-      <Image
-        source={{ uri: `https://image.tmdb.org/t/p/w500${item.poster_path}` }}
-        className="w-24 h-full rounded-[8px]"
-        resizeMode="cover"
-      />
-      <View className="flex-1 pl-3 pr-3 pt-2 pb-2">
-        <Text className="text-lg font-bold">{item.title}</Text>
-        {movieDetails && (
-          <>
-            <Text className="text-sm text-gray-600">
-              {formatReleaseDate(movieDetails.release_date)} •{" "}
-              {formatRuntime(movieDetails.runtime)}
-            </Text>
-            {/* Render genres as small FABs in a separate View */}
-            <View className="flex-row flex-wrap mt-1 items-center justify-center">
-              {movieDetails.genres.map((genre) => (
-                <View
-                  key={genre.id}
-                  className="bg-gray-200 rounded-full px-2 py-1 mx-1 mb-1"
-                >
-                  <Text className="text-[10px]">{genre.name}</Text>
-                </View>
-              ))}
-            </View>
-          </>
-        )}
-        <Text 
-            className="text-sm text-gray-600 mt-2"
-            numberOfLines={movieDetails?.genres?.length > 4 ? 2 : 3}
-        >
-          {item.overview}
-        </Text>
-      </View>
-    </View>
+    <MediaCard
+      type={"movie"}      // "movie" or "show"
+      id={item.id} 
+      posterPath={item.poster_path}
+      title={item.title}
+      overview={item.overview}
+      details={movieDetails}
+      saved={!!savedDocId}
+      onSave={handleSaveOrRemoveMovie}
+      formatPrimaryInfo={formatPrimaryInfo}
+    >
+      {renderedGenres}
+    </MediaCard>
   );
 };
 
-export default MovieCard;
+export default React.memo(MovieCard);
